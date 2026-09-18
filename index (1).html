@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARCHIWUM — RP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #ffffff;
+    --paper-dark: #eef1f5;
+    --ink: #1c2530;
+    --ink-soft: #64707e;
+    --accent: #2b5aa3;
+    --accent-dark: #204580;
+    --accent-soft: #eaf0f9;
+    --line: #dbe1e8;
+    --card-bg: #f7f9fb;
+    --cabinet: #16202e;
+    --cabinet-line: rgba(255,255,255,0.08);
+    --success: #2f7d5c;
+    --danger: #b3432f;
+    --pin: #b8862f;
+    --pin-soft: #fbf1de;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --paper: #1a2130;
+      --paper-dark: #141a26;
+      --ink: #e6eaf0;
+      --ink-soft: #98a3b3;
+      --accent: #6ea1e8;
+      --accent-dark: #8fb6ee;
+      --accent-soft: #223047;
+      --card-bg: #212a3b;
+      --line: #303c50;
+      --cabinet: #0d1219;
+      --cabinet-line: rgba(255,255,255,0.08);
+      --pin: #d9ab5a;
+      --pin-soft: #332a17;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper: #1a2130;
+    --paper-dark: #141a26;
+    --ink: #e6eaf0;
+    --ink-soft: #98a3b3;
+    --accent: #6ea1e8;
+    --accent-dark: #8fb6ee;
+    --accent-soft: #223047;
+    --card-bg: #212a3b;
+    --line: #303c50;
+    --cabinet: #0d1219;
+    --cabinet-line: rgba(255,255,255,0.08);
+    --pin: #d9ab5a;
+    --pin-soft: #332a17;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: var(--paper-dark);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+  }
+
+  .app{
+    display:flex;
+    min-height:100vh;
+  }
+
+  /* ---------- LEFT: drawer / index ---------- */
+  .drawer{
+    width: 290px;
+    flex: none;
+    background: var(--cabinet);
+    border-right: 1px solid var(--cabinet-line);
+    padding: 24px 16px;
+    display:flex;
+    flex-direction:column;
+  }
+  .drawer-title{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    color: #f3f6fa;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    margin: 0 6px 4px;
+  }
+  .drawer-sub{
+    color: #7e8ba0;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    margin: 0 6px 16px;
+  }
+
+  .type-switch{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--cabinet-line);
+    border-radius: 8px;
+    padding: 4px;
+    margin-bottom: 14px;
+  }
+  .type-switch button{
+    flex:1;
+    background: none;
+    border: none;
+    color: #9aa5b5;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 500;
+    font-size: 10.5px;
+    padding: 8px 4px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .type-switch button.active{
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .search-input{
+    width:100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--cabinet-line);
+    color: #eef1f5;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 12.5px;
+    padding: 9px 12px;
+    border-radius: 7px;
+    margin-bottom: 14px;
+  }
+  .search-input::placeholder{ color: #6f7a8c; }
+  .search-input:focus{
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(255,255,255,0.08);
+  }
+  .no-results{
+    color: #7e8ba0;
+    font-size: 12px;
+    padding: 14px 6px;
+    text-align:center;
+  }
+  .sync-status{
+    display:flex;
+    align-items:center;
+    gap: 6px;
+    margin: 0 6px 12px;
+    font-size: 10.5px;
+    color: #8b96a8;
+  }
+  .sync-status .dot{
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #5f6b7d;
+    flex: none;
+  }
+  .sync-status.live .dot{ background: #4caf7d; }
+  .sync-status.local .dot{ background: #d0a23a; }
+  .case-list{
+    list-style:none;
+    margin:0; padding:0;
+    flex:1;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap: 6px;
+  }
+  .case-item{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--cabinet-line);
+    border-left: 4px solid transparent;
+    padding: 10px 8px 10px 10px;
+    border-radius: 6px;
+    cursor:pointer;
+    color: #c3cbd8;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .case-item:hover{ background: rgba(255,255,255,0.06); }
+  .case-item.active{
+    border-left-color: var(--accent);
+    background: rgba(110,161,232,0.12);
+    color: #f3f6fa;
+  }
+  .case-item.pinned{
+    background: rgba(216,171,90,0.10);
+    border-left-color: var(--pin);
+  }
+  .case-item.pinned.active{
+    background: rgba(216,171,90,0.18);
+  }
+  .case-item .tab-color{
+    width: 8px; height: 8px; border-radius: 50%;
+    flex: none;
+    background: var(--accent);
+  }
+  .case-item.pinned .tab-color{ background: var(--pin); }
+  .case-item .meta{
+    flex:1;
+    min-width:0;
+  }
+  .case-item .meta .nm{
+    font-size: 13px;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight:600;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .case-item .meta .id{
+    font-size: 9.5px;
+    font-family:'IBM Plex Mono', monospace;
+    color: #7e8ba0;
+    letter-spacing: 0.03em;
+  }
+  .pin-btn{
+    flex: none;
+    background: none;
+    border: none;
+    color: #5f6b7d;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 5px;
+  }
+  .pin-btn:hover{ background: rgba(255,255,255,0.08); }
+  .pin-btn.is-pinned{ color: var(--pin); }
+
+  .new-case-btn{
+    margin-top: 14px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight: 500;
+    font-size: 12.5px;
+    letter-spacing: 0.01em;
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor:pointer;
+  }
+  .new-case-btn:hover{ background: var(--accent-dark); }
+
+  .drawer-count{
+    color: #5f6b7d;
+    font-size: 10px;
+    margin: 10px 6px 0;
+  }
+
+  /* ---------- RIGHT: sheet ---------- */
+  .main{
+    flex: 1;
+    padding: 36px 24px 70px;
+    overflow-y:auto;
+  }
+
+  .empty-state{
+    max-width: 420px;
+    margin: 80px auto;
+    text-align:center;
+    color: #cfc6b2;
+  }
+  .empty-state h2{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  .empty-state p{ font-size: 13px; color: #9099a8; margin-bottom: 18px;}
+
+  .folder-wrap{ max-width: 980px; margin: 0 auto; }
+
+  .tab{
+    display:inline-flex;
+    align-items:center;
+    gap: 6px;
+    background: var(--accent);
+    color:#fff;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    padding: 9px 20px 9px;
+    border-radius: 7px 7px 0 0;
+    margin-left: 30px;
+  }
+  .tab.company{ background: var(--success); }
+
+  .sheet{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px 12px 12px 12px;
+    padding: 46px 46px 40px;
+    box-shadow: 0 1px 3px rgba(16,24,40,0.06), 0 8px 24px rgba(16,24,40,0.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .head{
+    display:flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 16px;
+    margin-bottom: 22px;
+    gap: 10px;
+  }
+  .head-left .kicker{ font-size: 11px; letter-spacing: 0.1em; color: var(--ink-soft); text-transform: uppercase; }
+  .head-left h1{
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    margin: 4px 0 2px;
+    line-height: 1.15;
+    color: var(--ink);
+  }
+  .head-left .sub{ font-size: 13px; color: var(--ink-soft); font-family:'IBM Plex Mono', monospace; }
+
+  .head-right{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap: 8px;
+  }
+  .stamp{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    color: var(--accent-dark);
+    padding: 6px 14px;
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .stamp.pinned{
+    background: var(--pin-soft);
+    border-color: var(--pin);
+    color: var(--pin);
+  }
+  .head-btns{ display:flex; gap: 8px; }
+  .pin-toggle-btn, .delete-case-btn{
+    background:none;
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size: 11.5px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor:pointer;
+  }
+  .pin-toggle-btn.is-pinned{
+    color: var(--pin);
+    border-color: var(--pin);
+    background: var(--pin-soft);
+  }
+  .delete-case-btn:hover{ color: var(--danger); border-color: var(--danger); }
+
+  .body{}
+
+  .id-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 28px;
+    margin-bottom: 32px;
+  }
+  .field label{
+    display:block;
+    font-size: 11px;
+    letter-spacing: 0.09em;
+    color: var(--ink-soft);
+    margin-bottom: 5px;
+  }
+  .field input, .field textarea{
+    width:100%;
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15.5px;
+    padding: 10px 12px;
+    border-radius: 7px;
+  }
+  .field input:focus, .field textarea:focus{
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: var(--accent);
+  }
+  .field.wide{ grid-column: 1 / -1; }
+
+  .section{ margin-bottom: 32px; }
+  .section-title{
+    display:flex; align-items:center; gap: 10px;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 15px; letter-spacing: 0.02em;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+  .section-title .n{
+    background: var(--accent-soft); color: var(--accent-dark);
+    width: 22px; height: 22px; border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 11.5px; font-weight:700; flex: none;
+  }
+  .section-title::after{ content:""; flex:1; height:1px; background: var(--line); }
+
+  .balance-row{
+    display:flex; align-items: baseline; gap: 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    border-left: 5px solid var(--accent);
+    padding: 18px 20px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
+  .balance-row.company{ border-left-color: var(--success); }
+  .balance-row .label{ font-size: 12px; color: var(--ink-soft); letter-spacing: 0.06em;}
+  .balance-row input{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 30px; font-weight:600;
+    background: transparent; border: none;
+    color: var(--ink); width: 260px;
+  }
+  .balance-row input:focus{ outline: none; border-bottom: 2px solid var(--accent); }
+  .currency{ font-size:16px; color: var(--ink-soft); }
+
+  table{ width:100%; border-collapse: collapse; font-size: 14.5px; }
+  thead th{
+    text-align:left; font-size: 10.5px; letter-spacing: 0.06em;
+    color: var(--ink-soft); border-bottom: 1px solid var(--line);
+    padding: 6px 10px 10px;
+    text-transform: uppercase;
+  }
+  tbody td{ padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  tbody tr:hover{ background: var(--card-bg); }
+  td input, td select{
+    width:100%;
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    padding: 7px 9px;
+    border-radius: 6px;
+  }
+  .del-btn{
+    background:none; border: 1px solid var(--line); color: var(--ink-soft);
+    width: 30px; height: 30px; border-radius: 7px; cursor:pointer; font-size: 15px; line-height:1;
+  }
+  .del-btn:hover{ border-color: var(--danger); color: var(--danger); }
+
+  .add-btn{
+    margin-top: 12px;
+    background: var(--accent); color: #fff;
+    border: none; font-family:'IBM Plex Sans', sans-serif;
+    font-weight: 500;
+    font-size: 13.5px; letter-spacing: 0.01em;
+    padding: 10px 16px; border-radius: 7px; cursor:pointer;
+  }
+  .add-btn:hover{ background: var(--accent-dark); }
+  .add-btn.company{ background: var(--success); }
+  .add-btn.company:hover{ background: #235f45; }
+
+  .cars-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .car-card{
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    position: relative;
+  }
+  .car-card .del-btn{ position:absolute; top:10px; right:10px; }
+  .car-card .field{ margin-bottom: 10px; }
+  .car-card .field:last-child{ margin-bottom:0; }
+
+  .footer-actions{
+    display:flex; align-items:center; gap: 10px; flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .export-btn{
+    background: var(--paper); border: 1px solid var(--line); color: var(--ink-soft);
+    cursor:pointer; font-family:'IBM Plex Sans', sans-serif; font-size: 11.5px;
+    padding: 6px 12px; border-radius: 6px;
+  }
+  .export-btn:hover{ color: var(--accent-dark); border-color: var(--accent); }
+
+  .stats-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 8px;
+  }
+  .stats-summary{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .stat-card{
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .stat-card .label{
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .stat-card .value{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .leaderboard{
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 8px;
+  }
+  .leaderboard h3{
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 10px 14px;
+    color: var(--ink);
+  }
+  .lb-row{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 7px;
+  }
+  .lb-row:hover{ background: rgba(0,0,0,0.03); }
+  .lb-rank{
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 11px; font-weight: 700;
+    color: var(--ink-soft);
+    flex: none;
+  }
+  .lb-row:nth-child(1) .lb-rank{ background: #f5dfa4; border-color: #d8b23a; color: #7a5c15; }
+  .lb-row:nth-child(2) .lb-rank{ background: #e4e8ee; border-color: #b8c0cc; color: #4a5568; }
+  .lb-row:nth-child(3) .lb-rank{ background: #f0d9c4; border-color: #d9a878; color: #7a4a1f; }
+  .lb-name{
+    flex:1;
+    min-width:0;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+    white-space: nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .lb-balance{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    flex: none;
+  }
+  .lb-empty{
+    padding: 20px 14px;
+    text-align:center;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+  }
+
+  .history-list{
+    display:flex;
+    flex-direction:column;
+    gap: 8px;
+  }
+  .history-row{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+  .history-row .hist-icon{
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 15px;
+    flex: none;
+  }
+  .history-row.action-delete .hist-icon{ background: #fbe4de; color: var(--danger); }
+  .history-row.action-create .hist-icon{ background: #e2f3ea; color: var(--success); }
+  .history-row.action-undo .hist-icon{ background: var(--pin-soft); color: var(--pin); }
+  .history-row .hist-body{ flex:1; min-width:0; }
+  .history-row .hist-title{
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--ink);
+  }
+  .history-row .hist-meta{
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-family: 'IBM Plex Mono', monospace;
+    margin-top: 2px;
+  }
+  .history-row .undo-btn{
+    flex: none;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 11.5px;
+    padding: 7px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .history-row .undo-btn:hover{ color: var(--accent-dark); border-color: var(--accent); }
+
+  @media (max-width: 760px){
+    .stats-grid{ grid-template-columns: 1fr; }
+    .stats-summary{ grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 760px){
+    .app{ flex-direction:column; }
+    .drawer{ width:100%; border-right:none; border-bottom: 1px solid var(--cabinet-line); max-height: 260px; }
+    .id-grid{ grid-template-columns: 1fr; }
+    .head{ flex-direction:column; }
+  }
+
+  @media print{
+    .drawer{ display:none; }
+    body{ background:#fff; }
+    .tab{ display:none; }
+    .sheet{ box-shadow:none; border:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="drawer">
+    <div class="drawer-title">ARCHIWUM</div>
+    <div class="drawer-sub">LOS SANTOS RP — DOSSIER INDEX</div>
+
+    <div class="type-switch">
+      <button id="tabPeopleBtn" class="active">Archiwum akt</button>
+      <button id="tabCompaniesBtn">Archiwum firm</button>
+      <button id="tabStatsBtn">Statystyki</button>
+      <button id="tabHistoryBtn">Historia</button>
+    </div>
+
+    <div class="sync-status" id="syncStatus"></div>
+
+    <input type="text" class="search-input" id="searchInput" placeholder="Szukaj...">
+    <ul class="case-list" id="caseList"></ul>
+    <button class="new-case-btn" id="newCaseBtn">+ Nowa teczka</button>
+    <div class="drawer-count" id="caseCount"></div>
+  </div>
+
+  <div class="main" id="main"></div>
+</div>
+
+<!-- ===================== FIREBASE ===================== -->
+<!-- Wklej tu swój firebaseConfig ze strony console.firebase.google.com
+     (Ustawienia projektu → Twoje aplikacje → konfiguracja SDK) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBACAna_QGT57NS_No5qUv4mvZURjrIl7Y",
+    authDomain: "archiwum-17b01.firebaseapp.com",
+    projectId: "archiwum-17b01",
+    storageBucket: "archiwum-17b01.firebasestorage.app",
+    messagingSenderId: "854969826433",
+    appId: "1:854969826433:web:6b8f8e60e8f19caa21e180"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const fbDb = firebase.firestore();
+</script>
+<!-- ===================================================== -->
+
+<script>
+(function(){
+  const STORAGE_KEY = 'archiwum_rp_v3';
+  const OLD_STORAGE_KEY = 'archiwum_akt_rp_v1';
+
+  let state = {
+    activeTab: 'people', // 'people' | 'companies'
+    people: [],
+    companies: [],
+    activePersonId: null,
+    activeCompanyId: null
+  };
+  let searchQuery = '';
+
+  // ---------- Shared DB layer ----------
+  let db = null;
+  let useDb = false;
+  const pendingWrites = {}; // "kind:id" -> timeout handle
+
+  function keyFor(kind, id){ return kind + ':' + id; }
+
+  function mainHasFocus(){
+    const el = document.activeElement;
+    const main = document.getElementById('main');
+    return !!(el && main && main.contains(el) && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT'));
+  }
+
+  function setSyncStatus(mode){
+    const el = document.getElementById('syncStatus');
+    if(mode === 'live'){
+      el.className = 'sync-status live';
+      el.innerHTML = `<span class="dot"></span> Współdzielone na żywo`;
+    } else if(mode === 'connecting'){
+      el.className = 'sync-status';
+      el.innerHTML = `<span class="dot"></span> Łączenie...`;
+    } else {
+      el.className = 'sync-status local';
+      el.innerHTML = `<span class="dot"></span> Tylko na tym urządzeniu`;
+    }
+  }
+
+  let currentUser = null;
+  function getUserName(){
+    if(currentUser) return currentUser;
+    try{
+      let stored = localStorage.getItem('archiwum_rp_username');
+      if(!stored){
+        stored = prompt('Jak masz na imię? (to pojawi się w historii zmian)') || 'Anonim';
+        localStorage.setItem('archiwum_rp_username', stored);
+      }
+      currentUser = stored;
+    }catch(e){ currentUser = 'Anonim'; }
+    return currentUser;
+  }
+
+  function displayNameFor(kind, rec){
+    return kind === 'people'
+      ? ((`${rec.firstName||''} ${rec.lastName||''}`).trim() || 'Bez nazwy')
+      : ((rec.name||'').trim() || 'Bez nazwy');
+  }
+
+  async function logHistory(kind, id, action, label){
+    if(!useDb) return;
+    try{
+      await db.collection('history').add({
+        kind, docId: id, action,
+        label: label || '',
+        who: getUserName(),
+        ts: new Date().toISOString()
+      });
+    }catch(e){ console.warn('history log failed', e); }
+  }
+
+  function scheduleWrite(kind, rec){
+    if(!useDb) return;
+    const k = keyFor(kind, rec.id);
+    if(pendingWrites[k]) clearTimeout(pendingWrites[k]);
+    pendingWrites[k] = setTimeout(()=> flushWrite(kind, rec.id), 400);
+  }
+
+  async function flushWrite(kind, id){
+    delete pendingWrites[keyFor(kind, id)];
+    const list = kind === 'people' ? state.people : state.companies;
+    const rec = list.find(x => x.id === id);
+    if(!rec) return;
+    const data = Object.assign({}, rec);
+    delete data.id;
+    try{
+      await db.collection(kind).doc(id).set(data);
+      logHistory(kind, id, 'update', displayNameFor(kind, rec));
+    }
+    catch(e){ console.warn('write failed', e); }
+  }
+
+  function writeNow(kind, rec){
+    if(!useDb) return;
+    const k = keyFor(kind, rec.id);
+    if(pendingWrites[k]){ clearTimeout(pendingWrites[k]); delete pendingWrites[k]; }
+    flushWrite(kind, rec.id);
+  }
+
+  async function dbCreate(kind, rec){
+    if(!useDb) return;
+    const data = Object.assign({}, rec);
+    delete data.id;
+    try{
+      await db.collection(kind).doc(rec.id).set(data);
+      logHistory(kind, rec.id, 'create', displayNameFor(kind, rec));
+    }
+    catch(e){ console.warn('create failed', e); }
+  }
+
+  async function dbDelete(kind, id, label){
+    if(!useDb) return;
+    try{
+      await db.collection(kind).doc(id).delete();
+      logHistory(kind, id, 'delete', label || '');
+    }
+    catch(e){ console.warn('delete failed', e); }
+  }
+
+  function uid(){ return 'c' + Math.random().toString(36).slice(2,9); }
+  function genCaseNum(prefix){
+    const rnd = Math.floor(1000 + Math.random()*8999);
+    const y = new Date().getFullYear();
+    return `${prefix}-${y}-${rnd}`;
+  }
+
+  function newPerson(firstName, lastName){
+    return {
+      id: uid(),
+      caseNum: genCaseNum('LS'),
+      firstName: firstName || '',
+      lastName: lastName || '',
+      alias: '', age: '', faction: '', job: '', notes: '',
+      balance: '0',
+      transactions: [],
+      cars: [],
+      pinned: false
+    };
+  }
+
+  function newCompany(name){
+    return {
+      id: uid(),
+      caseNum: genCaseNum('FIRMA'),
+      name: name || '',
+      owners: '',
+      coOwners: '',
+      notes: '',
+      balance: '0',
+      transactions: [],
+      pinned: false
+    };
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // ---------- LOAD / SAVE (local cache + fallback) ----------
+  function loadLocal(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(parsed && typeof parsed === 'object'){
+          state = Object.assign(state, parsed);
+        }
+      } else {
+        // migrate from old single-archive format if present
+        const oldRaw = localStorage.getItem(OLD_STORAGE_KEY);
+        if(oldRaw){
+          const oldParsed = JSON.parse(oldRaw);
+          if(oldParsed && Array.isArray(oldParsed.cases)){
+            state.people = oldParsed.cases.map(c => Object.assign({pinned:false}, c));
+            state.activePersonId = oldParsed.activeId || null;
+          }
+        }
+      }
+    }catch(e){ console.warn('load failed', e); }
+
+    if(state.people.length === 0){
+      const p = newPerson('Carlos', 'Salazar');
+      state.people.push(p);
+      state.activePersonId = p.id;
+    }
+    if(!state.activePersonId || !state.people.find(p=>p.id===state.activePersonId)){
+      state.activePersonId = state.people[0].id;
+    }
+    if(state.companies.length > 0 && (!state.activeCompanyId || !state.companies.find(c=>c.id===state.activeCompanyId))){
+      state.activeCompanyId = state.companies[0].id;
+    }
+  }
+
+  function save(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    catch(e){ console.warn('save failed', e); }
+  }
+
+  // ---------- Shared DB init ----------
+  async function initDb(){
+    setSyncStatus('connecting');
+    try{ db = fbDb; } catch(e){ db = null; }
+
+    if(!db){
+      useDb = false;
+      setSyncStatus('local');
+      return;
+    }
+    useDb = true;
+    setSyncStatus('live');
+
+    let peopleSeeded = false, companiesSeeded = false;
+
+    db.collection('people').onSnapshot(
+      snap => {
+        const docs = snap.docs.map(d => Object.assign({id: d.id}, d.data()));
+        if(!peopleSeeded){
+          peopleSeeded = true;
+          if(docs.length === 0){
+            // migrate any existing local people (or seed a first record) into shared db
+            const toSeed = state.people.length ? state.people : [newPerson('Carlos', 'Salazar')];
+            toSeed.forEach(p => dbCreate('people', p));
+            return; // next snapshot will carry the seeded docs
+          }
+        }
+        state.people = docs;
+        if(!state.activePersonId || !state.people.find(p=>p.id===state.activePersonId)){
+          state.activePersonId = state.people.length ? state.people[0].id : null;
+        }
+        save();
+        renderDrawer();
+        if(!mainHasFocus()) renderMain();
+      },
+      err => { console.warn('people subscription error', err); useDb = false; setSyncStatus('local'); }
+    );
+
+    db.collection('companies').onSnapshot(
+      snap => {
+        const docs = snap.docs.map(d => Object.assign({id: d.id}, d.data()));
+        if(!companiesSeeded){
+          companiesSeeded = true;
+          if(docs.length === 0 && state.companies.length){
+            state.companies.forEach(co => dbCreate('companies', co));
+            return;
+          }
+        }
+        state.companies = docs;
+        if(state.companies.length > 0 && (!state.activeCompanyId || !state.companies.find(c=>c.id===state.activeCompanyId))){
+          state.activeCompanyId = state.companies[0].id;
+        } else if(state.companies.length === 0){
+          state.activeCompanyId = null;
+        }
+        save();
+        renderDrawer();
+        if(!mainHasFocus()) renderMain();
+      },
+      err => { console.warn('companies subscription error', err); }
+    );
+  }
+
+  // ---------- Helpers for "current" list based on active tab ----------
+  function currentList(){
+    return state.activeTab === 'people' ? state.people : state.companies;
+  }
+  function currentActiveId(){
+    return state.activeTab === 'people' ? state.activePersonId : state.activeCompanyId;
+  }
+  function setCurrentActiveId(id){
+    if(state.activeTab === 'people') state.activePersonId = id;
+    else state.activeCompanyId = id;
+  }
+  function activeRecord(){
+    return currentList().find(x => x.id === currentActiveId());
+  }
+  function displayName(rec){
+    if(state.activeTab === 'people'){
+      return `${rec.firstName||''} ${rec.lastName||''}`.trim() || 'Bez nazwy';
+    }
+    return (rec.name||'').trim() || 'Bez nazwy';
+  }
+
+  // ---------- TAB SWITCH ----------
+  document.getElementById('tabPeopleBtn').addEventListener('click', ()=> switchTab('people'));
+  document.getElementById('tabCompaniesBtn').addEventListener('click', ()=> switchTab('companies'));
+  document.getElementById('tabStatsBtn').addEventListener('click', ()=> switchTab('stats'));
+  document.getElementById('tabHistoryBtn').addEventListener('click', ()=> switchTab('history'));
+  function switchTab(tab){
+    if(state.activeTab === tab) return;
+    state.activeTab = tab;
+    searchQuery = '';
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchInput').placeholder = tab === 'people' ? 'Szukaj po imieniu i nazwisku...' : 'Szukaj po nazwie firmy...';
+    document.getElementById('newCaseBtn').textContent = tab === 'people' ? '+ Nowa teczka' : '+ Nowa firma';
+    document.getElementById('tabPeopleBtn').classList.toggle('active', tab === 'people');
+    document.getElementById('tabCompaniesBtn').classList.toggle('active', tab === 'companies');
+    document.getElementById('tabStatsBtn').classList.toggle('active', tab === 'stats');
+    document.getElementById('tabHistoryBtn').classList.toggle('active', tab === 'history');
+
+    const hideListControls = (tab === 'stats' || tab === 'history');
+    document.getElementById('searchInput').style.display = hideListControls ? 'none' : '';
+    document.getElementById('newCaseBtn').style.display = hideListControls ? 'none' : '';
+    document.getElementById('caseList').style.display = hideListControls ? 'none' : '';
+    document.getElementById('caseCount').style.display = hideListControls ? 'none' : '';
+
+    save();
+    renderDrawer();
+    renderMain();
+  }
+
+  // ---------- MONEY FORMATTING ----------
+  function formatThousands(raw){
+    const digits = String(raw).replace(/\D/g, '');
+    if(!digits) return '';
+    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+  function parseMoney(str){
+    const n = parseInt(String(str||'').replace(/\D/g, ''), 10);
+    return isNaN(n) ? 0 : n;
+  }
+
+  // ---------- SEARCH ----------
+  document.getElementById('searchInput').addEventListener('input', e=>{
+    searchQuery = e.target.value;
+    renderDrawer();
+  });
+
+  // ---------- PIN sort/filter ----------
+  function sortedFiltered(){
+    const q = searchQuery.trim().toLocaleLowerCase('pl');
+    const list = currentList();
+    const filtered = list.filter(rec => {
+      if(!q) return true;
+      if(state.activeTab === 'people'){
+        const name = `${rec.firstName||''} ${rec.lastName||''}`.toLocaleLowerCase('pl');
+        const reversed = `${rec.lastName||''} ${rec.firstName||''}`.toLocaleLowerCase('pl');
+        return name.includes(q) || reversed.includes(q);
+      } else {
+        return (rec.name||'').toLocaleLowerCase('pl').includes(q);
+      }
+    });
+    return filtered.slice().sort((a,b)=> (b.pinned?1:0) - (a.pinned?1:0));
+  }
+
+  // ---------- DRAWER RENDER ----------
+  function renderDrawer(){
+    const list = document.getElementById('caseList');
+    list.innerHTML = '';
+    const items = sortedFiltered();
+    const activeId = currentActiveId();
+
+    if(items.length === 0){
+      const li = document.createElement('li');
+      li.className = 'no-results';
+      li.textContent = currentList().length === 0
+        ? (state.activeTab === 'people' ? 'Brak teczek w archiwum.' : 'Brak firm w archiwum.')
+        : 'Brak wyników wyszukiwania.';
+      list.appendChild(li);
+    }
+
+    items.forEach(rec => {
+      const li = document.createElement('li');
+      li.className = 'case-item' + (rec.id === activeId ? ' active' : '') + (rec.pinned ? ' pinned' : '');
+      const name = displayName(rec);
+      li.innerHTML = `
+        <span class="tab-color"></span>
+        <span class="meta">
+          <div class="nm">${escapeHtml(name)}</div>
+          <div class="id">${escapeHtml(rec.caseNum||'')}</div>
+        </span>
+        <button class="pin-btn ${rec.pinned ? 'is-pinned' : ''}" data-pin-id="${rec.id}" title="${rec.pinned ? 'Odepnij' : 'Oznacz jako ważne'}">${rec.pinned ? '★' : '☆'}</button>
+      `;
+      li.addEventListener('click', (e)=>{
+        if(e.target.closest('.pin-btn')) return;
+        setCurrentActiveId(rec.id);
+        save();
+        renderDrawer();
+        renderMain();
+      });
+      li.querySelector('.pin-btn').addEventListener('click', (e)=>{
+        e.stopPropagation();
+        rec.pinned = !rec.pinned;
+        save();
+        writeNow(state.activeTab, rec);
+        renderDrawer();
+        renderMain();
+      });
+      list.appendChild(li);
+    });
+
+    const total = currentList().length;
+    const noun = state.activeTab === 'people'
+      ? (total===1?'teczka':'teczek')
+      : (total===1?'firma':'firm');
+    document.getElementById('caseCount').textContent = `${total} ${noun} w archiwum`;
+  }
+
+  document.getElementById('newCaseBtn').addEventListener('click', ()=>{
+    searchQuery = '';
+    document.getElementById('searchInput').value = '';
+    if(state.activeTab === 'people'){
+      const p = newPerson('', '');
+      state.people.push(p);
+      state.activePersonId = p.id;
+      dbCreate('people', p);
+    } else {
+      const co = newCompany('');
+      state.companies.push(co);
+      state.activeCompanyId = co.id;
+      dbCreate('companies', co);
+    }
+    save();
+    renderDrawer();
+    renderMain();
+  });
+
+  // ---------- MAIN RENDER ----------
+  function renderMain(){
+    if(state.activeTab === 'people') renderPersonMain();
+    else if(state.activeTab === 'companies') renderCompanyMain();
+    else if(state.activeTab === 'stats') renderStatsMain();
+    else renderGlobalHistoryMain();
+  }
+
+  function renderPersonMain(){
+    const main = document.getElementById('main');
+    const c = activeRecord();
+    if(!c){
+      main.innerHTML = `<div class="empty-state"><h2>Brak teczek</h2><p>Dodaj pierwszą teczkę, żeby zacząć.</p></div>`;
+      return;
+    }
+
+    main.innerHTML = `
+      <div class="folder-wrap">
+        <div class="tab">AKTA / DOSSIER</div>
+        <div class="sheet">
+          <div class="head">
+            <div class="head-left">
+              <div class="kicker">TECZKA OSOBOWA — LOS SANTOS RP</div>
+              <h1 id="displayName">${escapeHtml((`${c.firstName||''} ${c.lastName||''}`).trim() || 'Bez nazwy')}</h1>
+              <div class="sub">Akta nr ${escapeHtml(c.caseNum)}</div>
+            </div>
+            <div class="head-right">
+              <div class="stamp ${c.pinned?'pinned':''}">${c.pinned ? '★ WAŻNE' : 'POUFNE'}</div>
+              <div class="head-btns">
+                <button class="pin-toggle-btn ${c.pinned?'is-pinned':''}" id="pinToggleBtn">${c.pinned ? '★ Odepnij' : '☆ Oznacz jako ważne'}</button>
+                <button class="delete-case-btn" id="deleteCaseBtn">✕ Usuń teczkę</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="body">
+            <div class="id-grid">
+              <div class="field"><label>Imię</label><input type="text" id="f_firstName" value="${escapeHtml(c.firstName)}"></div>
+              <div class="field"><label>Nazwisko</label><input type="text" id="f_lastName" value="${escapeHtml(c.lastName)}"></div>
+              <div class="field"><label>Ksywa / alias</label><input type="text" id="f_alias" value="${escapeHtml(c.alias)}" placeholder="np. „El Toro”"></div>
+              <div class="field"><label>Wiek</label><input type="text" id="f_age" value="${escapeHtml(c.age)}" placeholder="np. 34"></div>
+              <div class="field"><label>Frakcja / organizacja</label><input type="text" id="f_faction" value="${escapeHtml(c.faction)}" placeholder="np. Vagos, LSPD"></div>
+              <div class="field"><label>Zawód / stanowisko</label><input type="text" id="f_job" value="${escapeHtml(c.job)}" placeholder="np. mechanik"></div>
+              <div class="field wide"><label>Notatki / rys postaci</label><textarea id="f_notes" rows="3" placeholder="Krótki opis postaci...">${escapeHtml(c.notes)}</textarea></div>
+            </div>
+
+            <div class="section">
+              <div class="section-title"><span class="n">1</span>SALDO BANKOWE</div>
+              <div class="balance-row">
+                <span class="label">STAN KONTA:</span>
+                <span class="currency">$</span>
+                <input type="text" id="f_balance" value="${formatThousands(parseMoney(c.balance))}" inputmode="numeric">
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title"><span class="n">2</span>TRANSAKCJE</div>
+              <table>
+                <thead><tr>
+                  <th style="width:22%">Data</th>
+                  <th style="width:38%">Opis</th>
+                  <th style="width:20%">Kwota ($)</th>
+                  <th style="width:14%">Typ</th>
+                  <th style="width:6%"></th>
+                </tr></thead>
+                <tbody id="txBody"></tbody>
+              </table>
+              <button class="add-btn" id="addTx">+ Dodaj transakcję</button>
+            </div>
+
+            <div class="section">
+              <div class="section-title"><span class="n">3</span>POJAZDY</div>
+              <div class="cars-grid" id="carsGrid"></div>
+              <button class="add-btn" id="addCar">+ Dodaj pojazd</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-actions">
+          <button class="export-btn" id="exportTxt">⬇ Eksportuj teczkę (.txt)</button>
+          <button class="export-btn" id="exportJson">⬇ Eksportuj teczkę (.json)</button>
+          <button class="export-btn" id="exportAllJson">⬇ Eksportuj archiwum osób (.json)</button>
+          <button class="export-btn" id="printPdf">🖨 Drukuj / PDF</button>
+        </div>
+      </div>
+    `;
+
+    bindPersonEvents(c);
+    renderTx(c, 'txBody');
+    renderCars(c);
+  }
+
+  function renderCompanyMain(){
+    const main = document.getElementById('main');
+    const co = activeRecord();
+    if(!co){
+      main.innerHTML = `<div class="empty-state"><h2>Brak firm</h2><p>Dodaj pierwszą firmę, żeby zacząć.</p></div>`;
+      return;
+    }
+
+    main.innerHTML = `
+      <div class="folder-wrap">
+        <div class="tab company">AKTA FIRMY</div>
+        <div class="sheet">
+          <div class="head">
+            <div class="head-left">
+              <div class="kicker">TECZKA FIRMY — LOS SANTOS RP</div>
+              <h1 id="displayName">${escapeHtml((co.name||'').trim() || 'Bez nazwy')}</h1>
+              <div class="sub">Akta nr ${escapeHtml(co.caseNum)}</div>
+            </div>
+            <div class="head-right">
+              <div class="stamp ${co.pinned?'pinned':''}">${co.pinned ? '★ WAŻNE' : 'DZIAŁALNOŚĆ'}</div>
+              <div class="head-btns">
+                <button class="pin-toggle-btn ${co.pinned?'is-pinned':''}" id="pinToggleBtn">${co.pinned ? '★ Odepnij' : '☆ Oznacz jako ważne'}</button>
+                <button class="delete-case-btn" id="deleteCaseBtn">✕ Usuń firmę</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="body">
+            <div class="id-grid">
+              <div class="field wide"><label>Nazwa firmy</label><input type="text" id="f_name" value="${escapeHtml(co.name)}" placeholder="np. Los Santos Customs"></div>
+              <div class="field"><label>Właściciel(e)</label><input type="text" id="f_owners" value="${escapeHtml(co.owners)}" placeholder="np. Carlos Salazar"></div>
+              <div class="field"><label>Współwłaściciele</label><input type="text" id="f_coOwners" value="${escapeHtml(co.coOwners)}" placeholder="np. Maria Reyes, Big Smoke"></div>
+              <div class="field wide"><label>Notatki</label><textarea id="f_notes" rows="3" placeholder="Rodzaj działalności, historia firmy...">${escapeHtml(co.notes)}</textarea></div>
+            </div>
+
+            <div class="section">
+              <div class="section-title"><span class="n">1</span>SALDO FIRMY</div>
+              <div class="balance-row company">
+                <span class="label">STAN KONTA FIRMOWEGO:</span>
+                <span class="currency">$</span>
+                <input type="text" id="f_balance" value="${formatThousands(parseMoney(co.balance))}" inputmode="numeric">
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title"><span class="n">2</span>TRANSAKCJE FIRMY</div>
+              <table>
+                <thead><tr>
+                  <th style="width:22%">Data</th>
+                  <th style="width:38%">Opis</th>
+                  <th style="width:20%">Kwota ($)</th>
+                  <th style="width:14%">Typ</th>
+                  <th style="width:6%"></th>
+                </tr></thead>
+                <tbody id="txBody"></tbody>
+              </table>
+              <button class="add-btn company" id="addTx">+ Dodaj transakcję</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-actions">
+          <button class="export-btn" id="exportTxt">⬇ Eksportuj firmę (.txt)</button>
+          <button class="export-btn" id="exportJson">⬇ Eksportuj firmę (.json)</button>
+          <button class="export-btn" id="exportAllJson">⬇ Eksportuj archiwum firm (.json)</button>
+          <button class="export-btn" id="printPdf">🖨 Drukuj / PDF</button>
+        </div>
+      </div>
+    `;
+
+    bindCompanyEvents(co);
+    renderTx(co, 'txBody');
+  }
+
+  function renderGlobalHistoryMain(){
+    const main = document.getElementById('main');
+    main.innerHTML = `
+      <div class="folder-wrap">
+        <div class="tab">DZIENNIK ZDARZEŃ</div>
+        <div class="sheet">
+          <div class="head">
+            <div class="head-left">
+              <div class="kicker">HISTORIA — LOS SANTOS RP</div>
+              <h1>Historia zmian</h1>
+              <div class="sub">Ostatnie 50 zdarzeń w całym archiwum</div>
+            </div>
+          </div>
+          <div class="body">
+            <div class="leaderboard" id="globalHistoryList">
+              <div class="lb-empty">Wczytywanie...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    loadGlobalHistory();
+  }
+
+  async function loadGlobalHistory(){
+    const box = document.getElementById('globalHistoryList');
+    if(!useDb){
+      box.innerHTML = `<div class="lb-empty">Historia jest dostępna tylko przy aktywnym współdzieleniu na żywo.</div>`;
+      return;
+    }
+    const actionLabel = { create: 'dodał(a)', update: 'edytował(a)', delete: 'usunął(ęła)' };
+    const kindLabel = { people: 'osobę', companies: 'firmę' };
+    try{
+      const snap = await db.collection('history').orderBy('ts', 'desc').limit(50).get();
+      const entries = snap.docs.map(d => d.data());
+      if(entries.length === 0){
+        box.innerHTML = `<div class="lb-empty">Brak zdarzeń w historii.</div>`;
+        return;
+      }
+      box.innerHTML = entries.map(e => {
+        let when = '';
+        try{ when = e.ts ? new Date(e.ts).toLocaleString('pl-PL') : ''; }catch(err){}
+        return `
+          <div class="lb-row">
+            <div class="lb-name">
+              <span style="font-weight:700">${escapeHtml(e.who||'Ktoś')}</span>
+              ${actionLabel[e.action]||e.action} ${kindLabel[e.kind]||''} —
+              <span style="font-weight:600">${escapeHtml(e.label||'')}</span>
+            </div>
+            <div class="lb-balance" style="font-weight:400; font-size:11px; color:var(--ink-soft)">${escapeHtml(when)}</div>
+          </div>
+        `;
+      }).join('');
+    }catch(e){
+      console.warn('loadGlobalHistory failed', e);
+      box.innerHTML = `<div class="lb-empty">Nie udało się wczytać historii.</div>`;
+    }
+  }
+
+  function renderStatsMain(){
+    const main = document.getElementById('main');
+
+    const peopleRanked = state.people
+      .map(p => ({ id: p.id, name: (`${p.firstName||''} ${p.lastName||''}`).trim() || 'Bez nazwy', balance: parseMoney(p.balance) }))
+      .sort((a,b) => b.balance - a.balance);
+
+    const companiesRanked = state.companies
+      .map(co => ({ id: co.id, name: (co.name||'').trim() || 'Bez nazwy', balance: parseMoney(co.balance) }))
+      .sort((a,b) => b.balance - a.balance);
+
+    const totalPeopleWealth = peopleRanked.reduce((s,p)=> s + p.balance, 0);
+    const totalCompanyWealth = companiesRanked.reduce((s,c)=> s + c.balance, 0);
+    const richestOverall = [...peopleRanked.map(p=>({...p, kind:'Osoba'})), ...companiesRanked.map(c=>({...c, kind:'Firma'}))]
+      .sort((a,b)=> b.balance - a.balance)[0];
+
+    function lbRows(list){
+      if(list.length === 0) return `<div class="lb-empty">Brak danych.</div>`;
+      return list.slice(0, 15).map((rec, i) => `
+        <div class="lb-row">
+          <div class="lb-rank">${i+1}</div>
+          <div class="lb-name">${escapeHtml(rec.name)}</div>
+          <div class="lb-balance">$${formatThousands(rec.balance)}</div>
+        </div>
+      `).join('');
+    }
+
+    main.innerHTML = `
+      <div class="folder-wrap">
+        <div class="tab">STATYSTYKI SERWERA</div>
+        <div class="sheet">
+          <div class="head">
+            <div class="head-left">
+              <div class="kicker">PODSUMOWANIE — LOS SANTOS RP</div>
+              <h1>Statystyki</h1>
+              <div class="sub">Ranking na podstawie aktualnych sald</div>
+            </div>
+          </div>
+
+          <div class="body">
+            <div class="stats-summary">
+              <div class="stat-card">
+                <div class="label">Najbogatszy ogółem</div>
+                <div class="value">${richestOverall ? escapeHtml(richestOverall.name) : '—'}</div>
+              </div>
+              <div class="stat-card">
+                <div class="label">Suma sald — osoby</div>
+                <div class="value">$${formatThousands(totalPeopleWealth)}</div>
+              </div>
+              <div class="stat-card">
+                <div class="label">Suma sald — firmy</div>
+                <div class="value">$${formatThousands(totalCompanyWealth)}</div>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="leaderboard">
+                <h3>💰 Najbogatsze osoby</h3>
+                ${lbRows(peopleRanked)}
+              </div>
+              <div class="leaderboard">
+                <h3>🏢 Najbogatsze firmy</h3>
+                ${lbRows(companiesRanked)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderTx(rec, tbodyId){
+    const body = document.getElementById(tbodyId);
+    body.innerHTML = '';
+    rec.transactions.forEach((tx, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="text" data-i="${i}" data-f="date" value="${escapeHtml(tx.date||'')}" placeholder="DD.MM.RRRR"></td>
+        <td><input type="text" data-i="${i}" data-f="desc" value="${escapeHtml(tx.desc||'')}" placeholder="opis"></td>
+        <td><input type="text" data-i="${i}" data-f="amount" value="${tx.amount ? formatThousands(parseMoney(tx.amount)) : ''}" placeholder="0" inputmode="numeric"></td>
+        <td>
+          <select data-i="${i}" data-f="type">
+            <option value="wplyw" ${tx.type==='wplyw'?'selected':''}>wpływ</option>
+            <option value="wydatek" ${tx.type==='wydatek'?'selected':''}>wydatek</option>
+          </select>
+        </td>
+        <td><button class="del-btn" data-del-tx="${i}" title="Usuń">✕</button></td>
+      `;
+      body.appendChild(tr);
+    });
+  }
+
+  function renderCars(c){
+    const grid = document.getElementById('carsGrid');
+    grid.innerHTML = '';
+    c.cars.forEach((car, i) => {
+      const div = document.createElement('div');
+      div.className = 'car-card';
+      div.innerHTML = `
+        <button class="del-btn" data-del-car="${i}" title="Usuń">✕</button>
+        <div class="field"><label>Model</label><input type="text" data-i="${i}" data-f="model" value="${escapeHtml(car.model||'')}" placeholder="np. Vapid Dominator"></div>
+        <div class="field"><label>Tablica</label><input type="text" data-i="${i}" data-f="plate" value="${escapeHtml(car.plate||'')}" placeholder="np. 4KZL991"></div>
+        <div class="field"><label>Kolor</label><input type="text" data-i="${i}" data-f="color" value="${escapeHtml(car.color||'')}" placeholder="np. matowy czarny"></div>
+      `;
+      grid.appendChild(div);
+    });
+  }
+
+  function bindPinAndDelete(kind, rec, deleteMessage, deleteAction){
+    document.getElementById('pinToggleBtn').addEventListener('click', ()=>{
+      rec.pinned = !rec.pinned;
+      save();
+      writeNow(kind, rec);
+      renderDrawer();
+      renderMain();
+    });
+    document.getElementById('deleteCaseBtn').addEventListener('click', ()=>{
+      if(confirm(deleteMessage)){
+        deleteAction();
+      }
+    });
+  }
+
+  function bindTxEvents(kind, rec){
+    document.getElementById('addTx').addEventListener('click', ()=>{
+      rec.transactions.push({date:'', desc:'', amount:'', type:'wplyw'});
+      renderTx(rec, 'txBody');
+      save();
+      writeNow(kind, rec);
+    });
+    document.getElementById('txBody').addEventListener('input', e=>{
+      const i = e.target.getAttribute('data-i');
+      const f = e.target.getAttribute('data-f');
+      if(i===null || !f) return;
+      if(f === 'amount'){
+        const formatted = formatThousands(e.target.value);
+        e.target.value = formatted;
+        rec.transactions[i][f] = formatted;
+      } else {
+        rec.transactions[i][f] = e.target.value;
+      }
+      save();
+      scheduleWrite(kind, rec);
+    });
+    document.getElementById('txBody').addEventListener('click', e=>{
+      const idx = e.target.getAttribute('data-del-tx');
+      if(idx!==null){
+        rec.transactions.splice(idx,1);
+        renderTx(rec, 'txBody');
+        save();
+        writeNow(kind, rec);
+      }
+    });
+  }
+
+  function bindPersonEvents(c){
+    ['firstName','lastName','alias','age','faction','job','notes','balance'].forEach(key=>{
+      const el = document.getElementById('f_' + key);
+      el.addEventListener('input', e=>{
+        if(key === 'balance'){
+          const formatted = formatThousands(e.target.value);
+          e.target.value = formatted;
+          c.balance = formatted;
+        } else {
+          c[key] = e.target.value;
+        }
+        if(key==='firstName' || key==='lastName'){
+          const full = `${c.firstName||''} ${c.lastName||''}`.trim();
+          document.getElementById('displayName').textContent = full || 'Bez nazwy';
+          renderDrawer();
+        }
+        save();
+        scheduleWrite('people', c);
+      });
+    });
+
+    bindPinAndDelete(
+      'people',
+      c,
+      `Na pewno usunąć teczkę: ${(`${c.firstName||''} ${c.lastName||''}`).trim() || 'tę teczkę'}? Tej operacji nie można cofnąć.`,
+      ()=>{
+        state.people = state.people.filter(x => x.id !== c.id);
+        dbDelete('people', c.id, displayNameFor('people', c));
+        if(state.people.length === 0){
+          const nc = newPerson('', '');
+          state.people.push(nc);
+          state.activePersonId = nc.id;
+          dbCreate('people', nc);
+        } else {
+          state.activePersonId = state.people[0].id;
+        }
+        save();
+        renderDrawer();
+        renderMain();
+      }
+    );
+
+    bindTxEvents('people', c);
+
+    document.getElementById('addCar').addEventListener('click', ()=>{
+      c.cars.push({model:'', plate:'', color:''});
+      renderCars(c);
+      save();
+      writeNow('people', c);
+    });
+    document.getElementById('carsGrid').addEventListener('input', e=>{
+      const i = e.target.getAttribute('data-i');
+      const f = e.target.getAttribute('data-f');
+      if(i===null || !f) return;
+      c.cars[i][f] = e.target.value;
+      save();
+      scheduleWrite('people', c);
+    });
+    document.getElementById('carsGrid').addEventListener('click', e=>{
+      const idx = e.target.getAttribute('data-del-car');
+      if(idx!==null){
+        c.cars.splice(idx,1);
+        renderCars(c);
+        save();
+        writeNow('people', c);
+      }
+    });
+
+    document.getElementById('exportTxt').addEventListener('click', ()=> doExport('txt', c, 'person'));
+    document.getElementById('exportJson').addEventListener('click', ()=> doExport('json', c, 'person'));
+    document.getElementById('exportAllJson').addEventListener('click', ()=> doExport('all', c, 'person'));
+    document.getElementById('printPdf').addEventListener('click', ()=> window.print());
+  }
+
+  function bindCompanyEvents(co){
+    ['name','owners','coOwners','notes','balance'].forEach(key=>{
+      const el = document.getElementById('f_' + key);
+      el.addEventListener('input', e=>{
+        if(key === 'balance'){
+          const formatted = formatThousands(e.target.value);
+          e.target.value = formatted;
+          co.balance = formatted;
+        } else {
+          co[key] = e.target.value;
+        }
+        if(key==='name'){
+          document.getElementById('displayName').textContent = (co.name||'').trim() || 'Bez nazwy';
+          renderDrawer();
+        }
+        save();
+        scheduleWrite('companies', co);
+      });
+    });
+
+    bindPinAndDelete(
+      'companies',
+      co,
+      `Na pewno usunąć firmę: ${(co.name||'').trim() || 'tę firmę'}? Tej operacji nie można cofnąć.`,
+      ()=>{
+        state.companies = state.companies.filter(x => x.id !== co.id);
+        dbDelete('companies', co.id, displayNameFor('companies', co));
+        if(state.companies.length > 0){
+          state.activeCompanyId = state.companies[0].id;
+        } else {
+          state.activeCompanyId = null;
+        }
+        save();
+        renderDrawer();
+        renderMain();
+      }
+    );
+
+    bindTxEvents('companies', co);
+
+    document.getElementById('exportTxt').addEventListener('click', ()=> doExport('txt', co, 'company'));
+    document.getElementById('exportJson').addEventListener('click', ()=> doExport('json', co, 'company'));
+    document.getElementById('exportAllJson').addEventListener('click', ()=> doExport('all', co, 'company'));
+    document.getElementById('printPdf').addEventListener('click', ()=> window.print());
+  }
+
+  function buildTxtReport(rec, kind){
+    const lines = [];
+    if(kind === 'person'){
+      lines.push('TECZKA OSOBOWA — LOS SANTOS RP');
+      lines.push(`Akta nr: ${rec.caseNum}`);
+      lines.push('='.repeat(40));
+      lines.push(`Imię: ${rec.firstName}`);
+      lines.push(`Nazwisko: ${rec.lastName}`);
+      if(rec.alias) lines.push(`Ksywa: ${rec.alias}`);
+      if(rec.age) lines.push(`Wiek: ${rec.age}`);
+      if(rec.faction) lines.push(`Frakcja: ${rec.faction}`);
+      if(rec.job) lines.push(`Zawód: ${rec.job}`);
+      if(rec.notes) lines.push(`Notatki: ${rec.notes}`);
+      lines.push(`Ważne: ${rec.pinned ? 'TAK' : 'nie'}`);
+      lines.push('');
+      lines.push(`SALDO BANKOWE: $${rec.balance}`);
+    } else {
+      lines.push('TECZKA FIRMY — LOS SANTOS RP');
+      lines.push(`Akta nr: ${rec.caseNum}`);
+      lines.push('='.repeat(40));
+      lines.push(`Nazwa firmy: ${rec.name}`);
+      if(rec.owners) lines.push(`Właściciel(e): ${rec.owners}`);
+      if(rec.coOwners) lines.push(`Współwłaściciele: ${rec.coOwners}`);
+      if(rec.notes) lines.push(`Notatki: ${rec.notes}`);
+      lines.push(`Ważne: ${rec.pinned ? 'TAK' : 'nie'}`);
+      lines.push('');
+      lines.push(`SALDO FIRMY: $${rec.balance}`);
+    }
+    lines.push('');
+    lines.push('TRANSAKCJE:');
+    if(!rec.transactions || rec.transactions.length === 0){ lines.push('  (brak)'); }
+    else { rec.transactions.forEach(tx=>{
+      lines.push(`  [${tx.date||'—'}] ${tx.desc||'—'} — ${tx.type==='wydatek'?'-':'+'}$${tx.amount||'0'} (${tx.type})`);
+    }); }
+    if(kind === 'person'){
+      lines.push('');
+      lines.push('POJAZDY:');
+      if(!rec.cars || rec.cars.length === 0){ lines.push('  (brak)'); }
+      else { rec.cars.forEach(car=>{
+        lines.push(`  ${car.model||'—'} | tablica: ${car.plate||'—'} | kolor: ${car.color||'—'}`);
+      }); }
+    }
+    return lines.join('\n');
+  }
+
+  async function doExport(kind, rec, entityKind){
+    const isCompany = entityKind === 'company';
+    const nameForFile = isCompany
+      ? (rec.name||'firma').trim().replace(/\s+/g,'_')
+      : `${(rec.firstName||'postac').trim()}${rec.lastName ? '_'+rec.lastName.trim() : ''}`.replace(/\s+/g,'_');
+    const base = `${isCompany ? 'firma' : 'teczka'}_${nameForFile}`;
+
+    let filename, data;
+    if(kind === 'json'){
+      filename = `${base}.json`;
+      data = JSON.stringify(rec, null, 2);
+    } else if(kind === 'all'){
+      filename = isCompany ? 'archiwum_firm_rp.json' : 'archiwum_akt_rp.json';
+      data = JSON.stringify(isCompany ? state.companies : state.people, null, 2);
+    } else {
+      filename = `${base}.txt`;
+      data = buildTxtReport(rec, entityKind);
+    }
+
+    const blob = new Blob([data], {type: kind === 'txt' ? 'text/plain' : 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  loadLocal();
+  document.getElementById('tabPeopleBtn').classList.toggle('active', state.activeTab === 'people');
+  document.getElementById('tabCompaniesBtn').classList.toggle('active', state.activeTab === 'companies');
+  document.getElementById('newCaseBtn').textContent = state.activeTab === 'people' ? '+ Nowa teczka' : '+ Nowa firma';
+  document.getElementById('searchInput').placeholder = state.activeTab === 'people' ? 'Szukaj po imieniu i nazwisku...' : 'Szukaj po nazwie firmy...';
+  renderDrawer();
+  renderMain();
+
+  document.getElementById('main').addEventListener('focusout', ()=>{
+    setTimeout(()=>{ if(!mainHasFocus()) renderMain(); }, 200);
+  });
+
+  initDb();
+})();
+</script>
+
+</body>
+</html>
