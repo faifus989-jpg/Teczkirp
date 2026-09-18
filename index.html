@@ -718,6 +718,7 @@
   let db = null;
   let useDb = false;
   const pendingWrites = {}; // "kind:id" -> timeout handle
+  const pendingRecords = {}; // "kind:id" -> the live record reference actively being edited
 
   function keyFor(kind, id){ return kind + ':' + id; }
 
@@ -776,14 +777,16 @@
   function scheduleWrite(kind, rec){
     if(!useDb) return;
     const k = keyFor(kind, rec.id);
+    pendingRecords[k] = rec; // always the exact object being typed into right now
     if(pendingWrites[k]) clearTimeout(pendingWrites[k]);
     pendingWrites[k] = setTimeout(()=> flushWrite(kind, rec.id), 400);
   }
 
   async function flushWrite(kind, id){
-    delete pendingWrites[keyFor(kind, id)];
-    const list = kind === 'people' ? state.people : state.companies;
-    const rec = list.find(x => x.id === id);
+    const k = keyFor(kind, id);
+    delete pendingWrites[k];
+    const rec = pendingRecords[k];
+    delete pendingRecords[k];
     if(!rec) return;
     const data = Object.assign({}, rec);
     delete data.id;
@@ -797,6 +800,7 @@
   function writeNow(kind, rec){
     if(!useDb) return;
     const k = keyFor(kind, rec.id);
+    pendingRecords[k] = rec;
     if(pendingWrites[k]){ clearTimeout(pendingWrites[k]); delete pendingWrites[k]; }
     flushWrite(kind, rec.id);
   }
